@@ -23,3 +23,8 @@
 13. Connect to mongodb database
 14. Schema & Model for user
 15. Create seed router for testing
+16. GET /api/users -> isAdmin -> getAllUsers -> searchByName, searchByEmail, searchByPhone, + Pagination functionality
+17. responseHandler controller for error or success
+18. GET /api/users/:id -> get a single user by id
+19. How to create services in the backend
+20. DELETE /api/users/:id -> delete a single user by id

@@ -1,5 +1,6 @@
 const {Schema, model} = require("mongoose");
 const bcrypt = require("bcrypt");
+const { defaultImagePath } = require("../secret");
 
 
 const userScheme = new Schema({
@@ -31,6 +32,7 @@ const userScheme = new Schema({
     },
     image:{
         type: String,
+        default: defaultImagePath,
     },
     address: {
         type: String,
