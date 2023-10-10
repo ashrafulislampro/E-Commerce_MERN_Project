@@ -30,7 +30,8 @@
 20. DELETE /api/users/:id -> delete a single user by id
 21. Refactoring && reusability, dynamic
 22. deleteImage helper
-23. POSt /api/users -> create a user
-24. Add express validation middleware
-25. Add multer middleware for file upload
-26. PUT /api/users/:id -> update a single user by id
+23. POSt /api/users/process-register -> process the registration
+24. POSt /api/users/verify -> verify + register into database
+25. Add express validation middleware
+26. Add multer middleware for file upload
+27. PUT /api/users/:id -> update a single user by id
