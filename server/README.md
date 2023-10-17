@@ -31,7 +31,10 @@
 21. Refactoring && reusability, dynamic
 22. deleteImage helper
 23. POSt /api/users/process-register -> process the registration
-24. POSt /api/users/verify -> verify + register into database
-25. Add express validation middleware
-26. Add multer middleware for file upload
-27. PUT /api/users/:id -> update a single user by id
+24. Create JWT
+25. Setup smtp server and prepare email
+26. Send email
+27. POSt /api/users/verify -> verify + register into database
+28. Add express validation middleware
+29. Add multer middleware for file upload
+30. PUT /api/users/:id -> update a single user by id
