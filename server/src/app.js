@@ -3,10 +3,12 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const createError = require('http-errors');
 const xssClean = require('xss-clean');
+const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const userRouter = require('./routers/userRouter');
 const seedRouter = require('./routers/seedRouter');
 const { errorResponse } = require('./controllers/responseController');
+const authRouter = require('./routers/authRouter');
 const app = express();
 
 const apiLimiter = rateLimit({
@@ -17,14 +19,17 @@ const apiLimiter = rateLimit({
 
 app.use(apiLimiter);
 app.use(xssClean());
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/users", userRouter);
-app.use("/api/seed", seedRouter);
+app.use("/api/auth", authRouter); 
+app.use("/api/users", userRouter); 
+app.use("/api/seed", seedRouter); 
 
 const isLoggedIn = (req, res, next) =>{
     const isLogged = true;

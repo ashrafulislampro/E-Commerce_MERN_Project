@@ -33,8 +33,20 @@
 23. POSt /api/users/process-register -> process the registration
 24. Create JWT
 25. Setup smtp server and prepare email
-26. Send email
+26. Send email wutg nodemailer
 27. POSt /api/users/verify -> verify + register into database
-28. Add express validation middleware
-29. Add multer middleware for file upload
-30. PUT /api/users/:id -> update a single user by id
+28. add multer middleware for file upload
+29. filtering files by size and types
+30. Add express validation middleware
+31. Should we store image as string or buffer?
+32. PUT /api/users/:id -> update a single user by id authentication and authorization
+33. POST /api/auth/login -> user login
+34. POST /api/auth/logout -> user logout
+35. Middleware -> isLoggedIn, isLoggedOut, isAdmin
+36. input validation when singed in and refactoring
+37. PUT /api/users/ban-user -> ban user
+38. PUT /api/users/unban-user -> unban user
+39. PUT /api/users/update-user -> update the password
+40. POST /api/users/forget-password -> forget the password
+41. PUT /api/users/reset-password -> reset the password
+42. GET /api/auth/refresh -> refresh the token

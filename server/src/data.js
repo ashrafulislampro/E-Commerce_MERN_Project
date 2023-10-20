@@ -4,15 +4,17 @@ const data = {
             name: "Ashraful Islam",
             email: "ashrafulislam1659@gmail.com",
             phone: "01741691659",
-            password: "12345",
-            address: "Uttara, Dhaka"
+            password: "Ashraful123@",
+            address: "Uttara, Dhaka",
+            image: "default.png"
         },
         {
             name: "Rakibul Islam",
             email: "rakibulislam1659@gmail.com",
             phone: "01741698877",
-            password: "54321",
-            address: "Banani, Dhaka"
+            password: "Ashraful123@",
+            address: "Banani, Dhaka",
+            image: "default.png"
         }
     ]
 };

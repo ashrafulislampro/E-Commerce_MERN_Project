@@ -56,6 +56,7 @@ const getUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
+
     const id = req.params.id;
     const options = { password: 0 };
     const user = await findWithId(User, id, options);
@@ -76,9 +77,10 @@ const deleteUserById = async (req, res, next) => {
     const options = { password: 0 };
     const user = await findWithId(User, id, options);
 
-    const userImagePath = user.image;
-
-    deleteImage(userImagePath);
+    console.log("user80 : ", user);
+    // Local server থেকে image delete করার জন্য এই path ব্যবহার করতে হয় 
+    // const userImagePath = user.image;
+    // deleteImage(userImagePath);
 
     await User.findByIdAndDelete({
       _id: id,
@@ -98,6 +100,18 @@ const processRegister = async (req, res, next) => {
   try {
     const { name, email, password, phone, address } = req.body;
 
+    const image = req.file;
+    if(!image){
+      throw createError(400, 'Image file is required.');
+    }
+    if(image.size > 2097152){
+      throw createError(400, 'File too large. It must be less than 2 MB.');
+    }
+
+
+    const imageBufferString = image.buffer.toString('base64');
+
+
     const userExists = await User.exists({ email: email });
     if (userExists) {
       throw createError(
@@ -108,7 +122,7 @@ const processRegister = async (req, res, next) => {
 
     // create jwt
     const token = createJSONWebToken(
-      { name, email, password, phone, address },
+      { name, email, password, phone, address, image:imageBufferString },
       jwtActivationKey,
       "10m"
     );
@@ -175,10 +189,106 @@ const activateUserAccount = async (req, res, next) => {
     next(error);
   }
 };
+
+const updateUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = {password: 0};
+    await findWithId(User, id, options);
+    const updatedOptions = { new: true, runValidators: true, context: 'query' };
+
+     // name, password, phone, image, address
+    let updates = {};
+   
+   
+
+    for(let key in req.body){
+      if(['name', 'password', 'phone', 'address', ].includes(key)){
+        updates[key] = req.body[key];
+      }else if(['email'].includes(key)){
+        throw new Error('Email can not be updated');
+      }
+    }
+
+    const image = req.file;
+    if(image){
+      if(image.size > 2097152){
+        throw new Error('File too large. It must be less than 2 MB.');
+      }
+      updates.image = image.buffer.toString("base64");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, updates, updatedOptions).select("-password");
+
+    if(!updatedUser) {
+      throw createError(404, 'User with this ID does not exist.');
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User was updated successfully",
+      payload: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleBanUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = {password: 0};
+    await findWithId(User, id, options);
+    const updates = {isBanned: true};
+    const updatedOptions = { new: true, runValidators: true, context: 'query' };
+
+    
+    const updatedUser = await User.findByIdAndUpdate(id, updates, updatedOptions).select("-password");
+
+    if(!updatedUser) {
+      throw createError(400, 'User was not banned successfully.');
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User was banned successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleUnbanUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = {password: 0};
+    await findWithId(User, id, options);
+    const updates = {isBanned: false};
+    const updatedOptions = { new: true, runValidators: true, context: 'query' };
+
+    
+    const updatedUser = await User.findByIdAndUpdate(id, updates, updatedOptions).select("-password");
+
+    if(!updatedUser) {
+      throw createError(400, 'User was not unbanned successfully.');
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User was unbanned successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
   deleteUserById,
   processRegister,
   activateUserAccount,
+  updateUserById,
+  handleBanUserById,
+  handleUnbanUserById
 };
