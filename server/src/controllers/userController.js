@@ -1,10 +1,11 @@
 const createError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
+const bcrypt = require("bcryptjs");
 const { findWithId } = require("../services/findItem");
 const { deleteImage } = require("../helper/deleteImage");
 const { createJSONWebToken } = require("../helper/jsonWebToken");
-const { jwtActivationKey, clientURL } = require("../secret");
+const { jwtActivationKey, clientURL, jwtResetPasswordKey } = require("../secret");
 const emailWithNodeMailer = require("../helper/email");
 const jwt = require("jsonwebtoken");
 const fs = require("fs").promises;
@@ -147,7 +148,7 @@ const processRegister = async (req, res, next) => {
     return successResponse(res, {
       statusCode: 200,
       message: `Please go to your ${email} for completing your registration process.`,
-      payload: { token },
+      payload: { token, imageBufferString },
     });
   } catch (error) {
     next(error);
@@ -282,6 +283,123 @@ const handleUnbanUserById = async (req, res, next) => {
   }
 };
 
+
+
+const handleUpdatePassword = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const { oldPassword, newPassword} = req.body;
+
+    const user = await findWithId(User, userId);
+
+
+     // compare the password
+     const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+     if(!isPasswordMatch) {
+         throw createError(401, 'Old Password is not correct');
+     }
+
+    // const filter = {userId};
+    // const updates = {$set: {password: newPassword}};
+    // const updatedOptions = {new: true};
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {password: newPassword},
+      {new: true}
+       ).select("-password");
+
+    if(!updatedUser) {
+      throw createError(400, 'User password has not been updated successfully.');
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User password has been updated successfully.",      
+      payload: {updatedUser}
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const handleForgetPassword = async (req, res, next) => {
+  try {
+    const {email} = req.body;
+    const userData = await User.findOne({email: email});
+    if(!userData){
+      throw createError(404, 'Email is incorrect or you have not verified your email address. Please register yourself first.');
+    }
+
+ // create jwt
+ const token = createJSONWebToken(
+  {email},
+  jwtResetPasswordKey,
+  "10m"
+);
+
+// prepare email
+const emailData = {
+  email,
+  subject: "Reset Password Email",
+  html: `<h2>Hello ${userData.name} !</h2>
+    <p>Please click here to <a href="${clientURL}/api/users/reset_password/${token}" target="_blank">Reset your password</a></p>
+    `,
+};
+
+// send email with nodemailer
+try {
+  await emailWithNodeMailer(emailData);
+} catch (error) {
+  next(createError(500, "Failed to send reset password email"));
+  return;
+}
+
+return successResponse(res, {
+  statusCode: 200,
+  message: `Please go to your ${email} for reseting your password.`,
+  payload: {token},
+});
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const handleResetPassword = async (req, res, next) => {
+  try {
+    const {token, password} = req.body;
+
+    const decoded = jwt.verify(token, jwtResetPasswordKey);
+    console.log("decoded382", decoded);
+    if(!decoded){
+      throw createError(400, 'Invalid or expired token');
+    }
+    
+    const filter = {email: decoded.email};  
+    const updates = {password: password};
+    const options = {new: true};
+
+    const updatedUser = await User.findOneAndUpdate(
+      filter,
+      updates,
+      options
+       ).select("-password");
+
+    if(!updatedUser) {
+      throw createError(400, 'Password reset failed');
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "Password reset successfully.", 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
@@ -290,5 +408,8 @@ module.exports = {
   activateUserAccount,
   updateUserById,
   handleBanUserById,
-  handleUnbanUserById
+  handleUnbanUserById,
+  handleUpdatePassword,
+  handleForgetPassword,
+  handleResetPassword
 };

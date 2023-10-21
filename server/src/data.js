@@ -12,7 +12,7 @@ const data = {
             name: "Rakibul Islam",
             email: "rakibulislam1659@gmail.com",
             phone: "01741698877",
-            password: "Ashraful123@",
+            password: "Ashraful1234@",
             address: "Banani, Dhaka",
             image: "default.png"
         }
