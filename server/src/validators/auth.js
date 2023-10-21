@@ -128,13 +128,6 @@ const validateUserResetPassword = [
 
 ];
 
-const validateRefreshToken = [
-
-  body('token')
-  .trim()
-  .notEmpty()
-  .withMessage('Token is missing.'),
-];
 
 
-module.exports = {validateUserRegistration, validateUserLogin, validateUserPasswordUpdate, validateUserForgetPassword, validateUserResetPassword, validateRefreshToken};
+module.exports = {validateUserRegistration, validateUserLogin, validateUserPasswordUpdate, validateUserForgetPassword, validateUserResetPassword};
