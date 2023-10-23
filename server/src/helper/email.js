@@ -15,14 +15,14 @@ const transporter = nodemailer.createTransport({
 const emailWithNodeMailer = async (emailData) => {
   try {
     const mailOptions = {
-        from: smtpUserName, // sender address
-        to: emailData.email, // list of receivers
-        subject: emailData.subject, // Subject line
-        html: emailData.html, // html body
-      };
-    
-      const info = await transporter.sendMail(mailOptions);
-      console.log("Message sent %s", info.response);
+      from: smtpUserName, // sender address
+      to: emailData.email, // list of receivers
+      subject: emailData.subject, // Subject line
+      html: emailData.html, // html body
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Message sent %s", info.response);
   } catch (error) {
     console.error("Error occured while sending email: ", error);
     throw error;
