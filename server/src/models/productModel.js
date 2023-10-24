@@ -7,6 +7,7 @@ const productScheme = new Schema(
       type: String,
       required: [true, "Product name is required"],
       trim: true,
+      unique: true,
       minlength: [3, "The length of Product name can be minimum 3 characters."],
       maxlength: [150, "The length of Product name can be maximum 150 characters."]
     },
@@ -42,13 +43,8 @@ const productScheme = new Schema(
     },
     sold: {
       type: Number,
-      required: [true, "Sold quantity is required"],
       trim: true,
       default: 0,
-      validate: {
-        validator: (v) => v > 0,
-        message: (props)=> `${props.value} is not a valid sold quantity! Sold Quantity must be greater than 0`
-      }
     },
     shipping: {
       type: Number,      

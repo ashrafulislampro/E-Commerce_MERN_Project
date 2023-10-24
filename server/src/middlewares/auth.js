@@ -7,7 +7,7 @@ const isLoggedIn = async (req, res, next) => {
     const token = req.cookies.accessToken;
 
     if (!token) {
-      throw createError(401, "Access token not found.");
+      throw createError(401, "Access token not found. Please login again.");
     }
     const decoded = jwt.verify(token, jwtAccessKey);
     if (!decoded) {
