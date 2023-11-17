@@ -10,6 +10,7 @@ categoryRouter.post("/", validateCategory, runValidation, isLoggedIn, isAdmin, h
 
 categoryRouter.get("/", handleGetCategories);
 categoryRouter.get("/:slug", handleGetCategory);
+
 categoryRouter.put("/:slug",validateCategory, runValidation, isLoggedIn, isAdmin, handleUpdateCategory);
 
 categoryRouter.delete("/:slug", isLoggedIn, isAdmin, handleDeleteCategory);

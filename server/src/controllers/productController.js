@@ -36,17 +36,27 @@ const handleCreateProduct = async (req, res, next) => {
 
 const handleGetProducts = async (req, res, next) => {
     try {
+        const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 4;
+
+        const searchRegExp = new RegExp('.*' + search + '.*', 'i');
+
+        const filter = {
+          $or: [
+            {name: {$regex: searchRegExp}},
+            // {price: {$regex: searchRegExp}}          
+          ]
+        }
         
-        const products = await Product.find({}).populate('category').skip((page - 1) * limit).limit(limit).sort({createdAt: -1});
+        const products = await Product.find(filter).populate('category').skip((page - 1) * limit).limit(limit).sort({createdAt: -1});
 
         // const products = await getProducts();
         if(!products){
             throw createError(404, "Products not found !");
         }
 
-        const count = await Product.find({}).countDocuments();
+        const count = await Product.find(filter).countDocuments();
 
         return successResponse(res, {
             statusCode: 200,
@@ -111,6 +121,7 @@ const handleUpdatedProduct = async (req, res, next) => {
 
     let updates = {};
     const allowedFields = ["name", "description", "price", "quantity", "shipping", "sold", "category"];
+
     for (const key in req.body) {
       if (allowedFields.includes(key)) {
         updates[key] = req.body[key];
